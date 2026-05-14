@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>For You & Me Escape</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        background: #fbf7f4;
+        color: #262321;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .language-switcher {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 10;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        max-width: min(92vw, 360px);
+      }
+
+      .language-switcher button,
+      .start-button {
+        border: 1px solid #262321;
+        border-radius: 999px;
+        background: #fffdfa;
+        color: #262321;
+        cursor: pointer;
+        font: inherit;
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .language-switcher button {
+        min-width: 44px;
+        min-height: 36px;
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      .language-switcher button:hover,
+      .language-switcher button[aria-pressed="true"],
+      .start-button:hover {
+        background: #262321;
+        color: #fffdfa;
+      }
+
+      .language-switcher button:focus-visible,
+      .start-button:focus-visible {
+        outline: 3px solid #9d7c5f;
+        outline-offset: 3px;
+      }
+
+      .start-button:active,
+      .language-switcher button:active {
+        transform: translateY(1px);
+      }
+
+      main {
+        display: grid;
+        justify-items: center;
+        gap: 18px;
+        width: min(92vw, 680px);
+        padding: 76px 0 32px;
+      }
+
+      img {
+        display: block;
+        width: min(76vw, 500px);
+        height: auto;
+      }
+
+      .start-button {
+        min-width: 140px;
+        min-height: 48px;
+        padding: 13px 28px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 520px) {
+        .language-switcher {
+          top: 10px;
+          right: 10px;
+          gap: 5px;
+        }
+
+        .language-switcher button {
+          min-width: 39px;
+          min-height: 34px;
+          padding: 7px 8px;
+          font-size: 0.72rem;
+        }
+
+        main {
+          gap: 16px;
+          padding-top: 96px;
+        }
+
+        img {
+          width: min(88vw, 420px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="language-switcher" aria-label="Language">
+      <button type="button" data-language="en" aria-pressed="true">EN</button>
+      <button type="button" data-language="es" aria-pressed="false">ES</button>
+      <button type="button" data-language="fr" aria-pressed="false">FR</button>
+      <button type="button" data-language="nl" aria-pressed="false">NL</button>
+      <button type="button" data-language="it" aria-pressed="false">IT</button>
+    </nav>
+
+    <main>
+      <img src="Logo.jpg" alt="For You & Me Escape" data-i18n-attr="alt:logoAlt">
+      <button class="start-button" type="button" data-i18n="start">Start</button>
+    </main>
+
+    <script>
+      const translations = {
+        en: {
+          logoAlt: "For You & Me Escape",
+          start: "Start"
+        },
+        es: {
+          logoAlt: "For You & Me Escape",
+          start: "Empezar"
+        },
+        fr: {
+          logoAlt: "For You & Me Escape",
+          start: "Commencer"
+        },
+        nl: {
+          logoAlt: "For You & Me Escape",
+          start: "Start"
+        },
+        it: {
+          logoAlt: "For You & Me Escape",
+          start: "Inizia"
+        }
+      };
+
+      const languageNames = {
+        en: "English",
+        es: "Spanish",
+        fr: "French",
+        nl: "Dutch",
+        it: "Italian"
+      };
+
+      const languageButtons = document.querySelectorAll("[data-language]");
+
+      function setLanguage(language) {
+        const copy = translations[language] || translations.en;
+
+        document.documentElement.lang = language;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          element.textContent = copy[element.dataset.i18n];
+        });
+        document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
+          element.dataset.i18nAttr.split(",").forEach((entry) => {
+            const [attribute, key] = entry.split(":").map((part) => part.trim());
+            element.setAttribute(attribute, copy[key]);
+          });
+        });
+        languageButtons.forEach((button) => {
+          const isActive = button.dataset.language === language;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.setAttribute("aria-label", languageNames[button.dataset.language]);
+        });
+        localStorage.setItem("siteLanguage", language);
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.language));
+      });
+
+      document.querySelector(".start-button").addEventListener("click", () => {
+        window.location.href = "access.html";
+      });
+
+      setLanguage(localStorage.getItem("siteLanguage") || "en");
+    </script>
+  </body>
+</html>

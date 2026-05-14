@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome | For You & Me Escape</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #fbf7f4;
+        color: #262321;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .language-switcher {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 10;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        max-width: min(92vw, 360px);
+      }
+
+      .language-switcher button {
+        min-width: 44px;
+        min-height: 36px;
+        border: 1px solid #262321;
+        border-radius: 999px;
+        padding: 8px 10px;
+        background: #fffdfa;
+        color: #262321;
+        cursor: pointer;
+        font: 700 0.78rem Arial, Helvetica, sans-serif;
+        letter-spacing: 0;
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .language-switcher button:hover,
+      .language-switcher button[aria-pressed="true"] {
+        background: #262321;
+        color: #fffdfa;
+      }
+
+      .language-switcher button:focus-visible {
+        outline: 3px solid #9d7c5f;
+        outline-offset: 3px;
+      }
+
+      .language-switcher button:active {
+        transform: translateY(1px);
+      }
+
+      main {
+        display: grid;
+        justify-items: center;
+        gap: 28px;
+        width: min(88vw, 760px);
+        margin: 0 auto;
+        padding: 76px 0 46px;
+      }
+
+      .page-logo {
+        display: block;
+        width: min(42vw, 220px);
+        height: auto;
+      }
+
+      .welcome-panel {
+        display: grid;
+        gap: 28px;
+        width: min(100%, 690px);
+        text-align: center;
+      }
+
+      .welcome-title {
+        margin: 0;
+        font: 700 clamp(2rem, 6vw, 4rem) Georgia, "Times New Roman", serif;
+        letter-spacing: 0;
+        text-align: center;
+      }
+
+      .story-copy {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        font: clamp(1.08rem, 2.1vw, 1.34rem) Georgia, "Times New Roman", serif;
+        line-height: 1.52;
+        text-align: center;
+      }
+
+      .story-copy p {
+        margin: 0;
+      }
+
+      .details {
+        display: grid;
+        gap: 8px;
+        width: min(100%, 520px);
+        margin: 4px auto 16px;
+        font: clamp(1.08rem, 2.1vw, 1.34rem) Georgia, "Times New Roman", serif;
+        line-height: 1.52;
+        text-align: center;
+      }
+
+      .detail-row {
+        display: grid;
+        gap: 4px;
+        align-items: start;
+        justify-items: center;
+      }
+
+      .detail-label {
+        font-weight: 700;
+      }
+
+      .detail-value {
+        display: grid;
+        gap: 4px;
+        margin: 0;
+      }
+
+      .closing {
+        margin: 0;
+        font: clamp(1.08rem, 2.1vw, 1.32rem) Georgia, "Times New Roman", serif;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      @media (max-width: 520px) {
+        .language-switcher {
+          top: 10px;
+          right: 10px;
+          gap: 5px;
+        }
+
+        .language-switcher button {
+          min-width: 39px;
+          min-height: 34px;
+          padding: 7px 8px;
+          font-size: 0.72rem;
+        }
+
+        main {
+          gap: 22px;
+          padding-top: 96px;
+        }
+
+        .page-logo {
+          width: min(58vw, 200px);
+        }
+
+        .detail-row {
+          grid-template-columns: 1fr;
+          gap: 2px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="language-switcher" aria-label="Language">
+      <button type="button" data-language="en" aria-pressed="true">EN</button>
+      <button type="button" data-language="es" aria-pressed="false">ES</button>
+      <button type="button" data-language="fr" aria-pressed="false">FR</button>
+      <button type="button" data-language="nl" aria-pressed="false">NL</button>
+      <button type="button" data-language="it" aria-pressed="false">IT</button>
+    </nav>
+
+    <main>
+      <img class="page-logo" src="Logo.jpg" alt="For You & Me Escape" data-i18n-attr="alt:logoAlt">
+
+      <section class="welcome-panel">
+        <h1 class="welcome-title" data-i18n="welcome">Welcome</h1>
+
+        <div class="story-copy">
+          <p data-i18n="confirmed">Your entry has been confirmed.</p>
+          <p data-i18n="storyOne">What follows is not just a game, but a story,</p>
+          <p data-i18n="storyTwo">one that has been carefully prepared, waiting for the right moment to unfold.</p>
+        </div>
+
+        <dl class="details">
+          <div class="detail-row">
+            <dt class="detail-label" data-i18n="locationLabel">Location:</dt>
+            <dd class="detail-value" data-i18n="locationValue">Florence</dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label" data-i18n="participantsLabel">Participants:</dt>
+            <dd class="detail-value">
+              <span>Zainab Lagnaoui</span>
+              <span>Gustavo Adolfo Leal Matheus</span>
+            </dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label" data-i18n="statusLabel">Status:</dt>
+            <dd class="detail-value" data-i18n="statusValue">Active</dd>
+          </div>
+        </dl>
+
+        <p class="closing" data-i18n="closing">Instructions will follow. Stay observant.</p>
+      </section>
+    </main>
+
+    <script>
+      const translations = {
+        en: {
+          logoAlt: "For You & Me Escape",
+          welcome: "Welcome",
+          confirmed: "Your entry has been confirmed.",
+          storyOne: "What follows is not just a game, but a story,",
+          storyTwo: "one that has been carefully prepared, waiting for the right moment to unfold.",
+          locationLabel: "Location:",
+          locationValue: "Florence",
+          participantsLabel: "Participants:",
+          statusLabel: "Status:",
+          statusValue: "Active",
+          closing: "Instructions will follow. Stay observant."
+        },
+        es: {
+          logoAlt: "For You & Me Escape",
+          welcome: "Bienvenida",
+          confirmed: "Tu entrada ha sido confirmada.",
+          storyOne: "Lo que sigue no es solo un juego, sino una historia,",
+          storyTwo: "una que ha sido cuidadosamente preparada, esperando el momento adecuado para desplegarse.",
+          locationLabel: "Ubicacion:",
+          locationValue: "Florencia",
+          participantsLabel: "Participantes:",
+          statusLabel: "Estado:",
+          statusValue: "Activo",
+          closing: "Las instrucciones llegaran pronto. Mantente observadora."
+        },
+        fr: {
+          logoAlt: "For You & Me Escape",
+          welcome: "Bienvenue",
+          confirmed: "Ton entree a ete confirmee.",
+          storyOne: "Ce qui suit n'est pas seulement un jeu, mais une histoire,",
+          storyTwo: "preparee avec soin, attendant le bon moment pour se devoiler.",
+          locationLabel: "Lieu :",
+          locationValue: "Florence",
+          participantsLabel: "Participants :",
+          statusLabel: "Statut :",
+          statusValue: "Actif",
+          closing: "Les instructions suivront. Reste attentive."
+        },
+        nl: {
+          logoAlt: "For You & Me Escape",
+          welcome: "Welkom",
+          confirmed: "Je toegang is bevestigd.",
+          storyOne: "Wat volgt is niet zomaar een spel, maar een verhaal,",
+          storyTwo: "zorgvuldig voorbereid, wachtend op het juiste moment om zich te ontvouwen.",
+          locationLabel: "Locatie:",
+          locationValue: "Florence",
+          participantsLabel: "Deelnemers:",
+          statusLabel: "Status:",
+          statusValue: "Actief",
+          closing: "Instructies volgen. Blijf opmerkzaam."
+        },
+        it: {
+          logoAlt: "For You & Me Escape",
+          welcome: "Benvenuta",
+          confirmed: "Il tuo ingresso e stato confermato.",
+          storyOne: "Quello che segue non e solo un gioco, ma una storia,",
+          storyTwo: "preparata con cura, in attesa del momento giusto per rivelarsi.",
+          locationLabel: "Luogo:",
+          locationValue: "Firenze",
+          participantsLabel: "Partecipanti:",
+          statusLabel: "Stato:",
+          statusValue: "Attivo",
+          closing: "Le istruzioni seguiranno. Rimani attenta."
+        }
+      };
+
+      const languageNames = {
+        en: "English",
+        es: "Spanish",
+        fr: "French",
+        nl: "Dutch",
+        it: "Italian"
+      };
+
+      const languageButtons = document.querySelectorAll("[data-language]");
+
+      function setLanguage(language) {
+        const copy = translations[language] || translations.en;
+
+        document.documentElement.lang = language;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          element.textContent = copy[element.dataset.i18n];
+        });
+        document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
+          element.dataset.i18nAttr.split(",").forEach((entry) => {
+            const [attribute, key] = entry.split(":").map((part) => part.trim());
+            element.setAttribute(attribute, copy[key]);
+          });
+        });
+        languageButtons.forEach((button) => {
+          const isActive = button.dataset.language === language;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.setAttribute("aria-label", languageNames[button.dataset.language]);
+        });
+        localStorage.setItem("siteLanguage", language);
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.language));
+      });
+
+      setLanguage(localStorage.getItem("siteLanguage") || "en");
+    </script>
+  </body>
+</html>

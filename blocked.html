@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blocked | For You & Me Escape</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #fbf7f4;
+        color: #262321;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .language-switcher {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 10;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        max-width: min(92vw, 360px);
+      }
+
+      .language-switcher button {
+        min-width: 44px;
+        min-height: 36px;
+        border: 1px solid #262321;
+        border-radius: 999px;
+        padding: 8px 10px;
+        background: #fffdfa;
+        color: #262321;
+        cursor: pointer;
+        font: 700 0.78rem Arial, Helvetica, sans-serif;
+        letter-spacing: 0;
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .language-switcher button:hover,
+      .language-switcher button[aria-pressed="true"] {
+        background: #262321;
+        color: #fffdfa;
+      }
+
+      .language-switcher button:focus-visible {
+        outline: 3px solid #9d7c5f;
+        outline-offset: 3px;
+      }
+
+      .language-switcher button:active {
+        transform: translateY(1px);
+      }
+
+      main {
+        display: grid;
+        justify-items: center;
+        gap: 28px;
+        width: min(88vw, 760px);
+        margin: 0 auto;
+        padding: 76px 0 46px;
+        text-align: center;
+      }
+
+      .page-logo {
+        display: block;
+        width: min(42vw, 220px);
+        height: auto;
+      }
+
+      .blocked-panel {
+        display: grid;
+        gap: 18px;
+        width: min(100%, 640px);
+      }
+
+      .blocked-title {
+        margin: 0;
+        font: 700 clamp(2rem, 6vw, 4rem) Georgia, "Times New Roman", serif;
+        letter-spacing: 0;
+      }
+
+      .blocked-copy {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        font: clamp(1.08rem, 2.1vw, 1.34rem) Georgia, "Times New Roman", serif;
+        line-height: 1.52;
+      }
+
+      .blocked-copy p {
+        margin: 0;
+      }
+
+      @media (max-width: 520px) {
+        .language-switcher {
+          top: 10px;
+          right: 10px;
+          gap: 5px;
+        }
+
+        .language-switcher button {
+          min-width: 39px;
+          min-height: 34px;
+          padding: 7px 8px;
+          font-size: 0.72rem;
+        }
+
+        main {
+          gap: 22px;
+          padding-top: 96px;
+        }
+
+        .page-logo {
+          width: min(58vw, 200px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="language-switcher" aria-label="Language">
+      <button type="button" data-language="en" aria-pressed="true">EN</button>
+      <button type="button" data-language="es" aria-pressed="false">ES</button>
+      <button type="button" data-language="fr" aria-pressed="false">FR</button>
+      <button type="button" data-language="nl" aria-pressed="false">NL</button>
+      <button type="button" data-language="it" aria-pressed="false">IT</button>
+    </nav>
+
+    <main>
+      <img class="page-logo" src="Logo.jpg" alt="For You & Me Escape" data-i18n-attr="alt:logoAlt">
+
+      <section class="blocked-panel" aria-live="polite">
+        <h1 class="blocked-title" data-i18n="title">Blocked for now</h1>
+
+        <div class="blocked-copy">
+          <p data-i18n="message">This path is blocked for now.</p>
+          <p data-i18n="followUp">The next part will open when the time is right.</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const translations = {
+        en: {
+          logoAlt: "For You & Me Escape",
+          title: "Blocked for now",
+          message: "This path is blocked for now.",
+          followUp: "The next part will open when the time is right."
+        },
+        es: {
+          logoAlt: "For You & Me Escape",
+          title: "Bloqueado por ahora",
+          message: "Este camino esta bloqueado por ahora.",
+          followUp: "La siguiente parte se abrira cuando llegue el momento."
+        },
+        fr: {
+          logoAlt: "For You & Me Escape",
+          title: "Bloque pour l'instant",
+          message: "Ce chemin est bloque pour l'instant.",
+          followUp: "La prochaine partie s'ouvrira quand le moment sera venu."
+        },
+        nl: {
+          logoAlt: "For You & Me Escape",
+          title: "Voorlopig geblokkeerd",
+          message: "Dit pad is voorlopig geblokkeerd.",
+          followUp: "Het volgende deel opent wanneer de tijd rijp is."
+        },
+        it: {
+          logoAlt: "For You & Me Escape",
+          title: "Bloccato per ora",
+          message: "Questo percorso e bloccato per ora.",
+          followUp: "La prossima parte si aprira al momento giusto."
+        }
+      };
+
+      const languageNames = {
+        en: "English",
+        es: "Spanish",
+        fr: "French",
+        nl: "Dutch",
+        it: "Italian"
+      };
+
+      const languageButtons = document.querySelectorAll("[data-language]");
+
+      function setLanguage(language) {
+        const copy = translations[language] || translations.en;
+
+        document.documentElement.lang = language;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          element.textContent = copy[element.dataset.i18n];
+        });
+        document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
+          element.dataset.i18nAttr.split(",").forEach((entry) => {
+            const [attribute, key] = entry.split(":").map((part) => part.trim());
+            element.setAttribute(attribute, copy[key]);
+          });
+        });
+        languageButtons.forEach((button) => {
+          const isActive = button.dataset.language === language;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.setAttribute("aria-label", languageNames[button.dataset.language]);
+        });
+        localStorage.setItem("siteLanguage", language);
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.language));
+      });
+
+      setLanguage(localStorage.getItem("siteLanguage") || "en");
+    </script>
+  </body>
+</html>
