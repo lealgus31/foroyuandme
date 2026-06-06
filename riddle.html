@@ -199,19 +199,31 @@
       }
 
       .puzzle-stage[data-stage="ia"] .scroll-content {
-        inset: 10.5% 9.5% 12% 9.5%;
-        gap: clamp(10px, 1.2vw, 14px);
-        padding: clamp(14px, 2.4vw, 24px);
+        inset: 11.75% 8.75% 13% 8.75%;
+        gap: clamp(8px, 1.05vw, 12px);
+        padding: clamp(12px, 2vw, 22px);
       }
 
       .puzzle-stage[data-stage="ia"] .riddle-copy {
-        gap: 8px;
-        font-size: clamp(1.1rem, 2.28vw, 1.42rem);
-        line-height: 1.3;
+        gap: 7px;
+        font-size: clamp(0.98rem, 1.95vw, 1.28rem);
+        line-height: 1.22;
       }
 
       .puzzle-stage[data-stage="ia"] .riddle-copy p {
         text-wrap: balance;
+      }
+
+      .puzzle-stage[data-stage="ukq"] .scroll-content {
+        inset: 10.75% 9.25% 12.25% 9.25%;
+        gap: clamp(8px, 1vw, 13px);
+        padding: clamp(13px, 2.3vw, 26px);
+      }
+
+      .puzzle-stage[data-stage="ukq"] .riddle-copy {
+        gap: 7px;
+        font-size: clamp(1.03rem, 2.05vw, 1.38rem);
+        line-height: 1.42;
       }
 
       .answer-form {
@@ -419,14 +431,25 @@
         }
 
         .puzzle-stage[data-stage="ia"] .scroll-content {
-          inset: 10% 8.75% 11.25% 8.75%;
+          inset: 10.5% 8.25% 11.75% 8.25%;
+          gap: 7px;
+          padding: 11px 9px;
+        }
+
+        .puzzle-stage[data-stage="ia"] .riddle-copy {
+          font-size: clamp(0.94rem, 3.2vw, 1.12rem);
+          line-height: 1.15;
+        }
+
+        .puzzle-stage[data-stage="ukq"] .scroll-content {
+          inset: 9.75% 8.25% 10.75% 8.25%;
           gap: 8px;
           padding: 12px 10px;
         }
 
-        .puzzle-stage[data-stage="ia"] .riddle-copy {
-          font-size: clamp(1rem, 3.6vw, 1.24rem);
-          line-height: 1.16;
+        .puzzle-stage[data-stage="ukq"] .riddle-copy {
+          font-size: clamp(0.98rem, 3.35vw, 1.16rem);
+          line-height: 1.34;
         }
 
           .answer-input {
