@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Follow Up | For You & Me Escape</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #fbf7f4;
+        color: #2d231a;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .language-switcher {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 20;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        max-width: min(92vw, 360px);
+      }
+
+      .language-switcher button {
+        min-width: 44px;
+        min-height: 36px;
+        border: 1px solid #2d231a;
+        border-radius: 999px;
+        padding: 8px 10px;
+        background: rgba(255, 253, 250, 0.95);
+        color: #2d231a;
+        cursor: pointer;
+        font: 700 0.78rem Arial, Helvetica, sans-serif;
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .language-switcher button:hover,
+      .language-switcher button[aria-pressed="true"] {
+        background: #2d231a;
+        color: #fffdfa;
+      }
+
+      .language-switcher button:focus-visible {
+        outline: 3px solid #d6b88d;
+        outline-offset: 3px;
+      }
+
+      .language-switcher button:active {
+        transform: translateY(1px);
+      }
+
+      main {
+        width: min(92vw, 780px);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 28px 0 28px;
+        display: grid;
+        align-content: start;
+        justify-items: center;
+        gap: 12px;
+        text-align: center;
+      }
+
+      .page-logo {
+        display: block;
+        width: min(40vw, 230px);
+        height: auto;
+      }
+
+      .followup-shell,
+      .blocked-shell {
+        width: min(100%, 640px);
+        display: grid;
+        gap: 18px;
+        justify-items: center;
+      }
+
+      .followup-shell {
+        margin-top: 4px;
+      }
+
+      .followup-text,
+      .blocked-title {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .followup-text {
+        display: grid;
+        gap: 12px;
+        font-size: clamp(1.12rem, 2.4vw, 1.55rem);
+        line-height: 1.58;
+      }
+
+      .followup-art {
+        width: min(62vw, 250px);
+        margin: 12px auto 6px;
+        aspect-ratio: 1;
+        border: 4px solid rgba(45, 35, 26, 0.16);
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(255, 253, 250, 0.72);
+        box-shadow: 0 12px 28px rgba(61, 42, 22, 0.12);
+      }
+
+      .followup-art img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+      }
+
+      .followup-text p,
+      .blocked-copy p {
+        margin: 0;
+      }
+
+      .blocked-title {
+        font-size: clamp(1.9rem, 6vw, 3.6rem);
+      }
+
+      .blocked-copy {
+        display: grid;
+        gap: 12px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1.08rem, 2.2vw, 1.36rem);
+        line-height: 1.56;
+      }
+
+      .correct-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background: #fbf7f4;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 320ms ease;
+      }
+
+      .correct-overlay.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .correct-text {
+        width: 0;
+        margin: 0;
+        overflow: hidden;
+        border-right: 2px solid #2d231a;
+        color: #2d231a;
+        font: 700 clamp(1.8rem, 6vw, 4rem) Georgia, "Times New Roman", serif;
+        white-space: nowrap;
+      }
+
+      .correct-overlay.is-visible .correct-text {
+        animation: type-in 1.3s steps(var(--text-characters), end) forwards, cursor-blink 650ms step-end infinite;
+      }
+
+      .is-hidden {
+        display: none !important;
+      }
+
+      @keyframes type-in {
+        from {
+          width: 0;
+        }
+
+        to {
+          width: var(--text-width);
+        }
+      }
+
+      @keyframes cursor-blink {
+        50% {
+          border-color: transparent;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .language-switcher {
+          top: 10px;
+          right: 10px;
+          gap: 5px;
+        }
+
+        .language-switcher button {
+          min-width: 39px;
+          min-height: 34px;
+          padding: 7px 8px;
+          font-size: 0.72rem;
+        }
+
+        main {
+          padding-top: 50px;
+          gap: 10px;
+        }
+
+        .page-logo {
+          width: min(58vw, 220px);
+        }
+
+        .followup-art {
+          width: min(58vw, 220px);
+          margin-top: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="language-switcher" aria-label="Language">
+      <button type="button" data-language="en" aria-pressed="true">EN</button>
+      <button type="button" data-language="es" aria-pressed="false">ES</button>
+      <button type="button" data-language="fr" aria-pressed="false">FR</button>
+      <button type="button" data-language="nl" aria-pressed="false">NL</button>
+      <button type="button" data-language="it" aria-pressed="false">IT</button>
+    </nav>
+
+    <main>
+      <img class="page-logo" src="Logo.jpg" alt="For You & Me Escape" data-i18n-attr="alt:logoAlt">
+
+      <section class="followup-shell is-hidden" aria-live="polite" data-view="followup">
+        <div class="followup-art" aria-hidden="true">
+          <img src="bull.png" alt="" loading="lazy">
+        </div>
+        <div class="followup-text" data-followup-copy></div>
+      </section>
+
+      <section class="blocked-shell is-hidden" aria-live="polite" data-view="blocked">
+        <h1 class="blocked-title" data-i18n="blockedTitle">Blocked for now</h1>
+        <div class="blocked-copy">
+          <p data-i18n="blockedMessage">This path is blocked for now.</p>
+          <p data-i18n="blockedFollowUp">The next part will open when the time is right.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="correct-overlay" aria-live="polite" aria-hidden="true">
+      <p class="correct-text" data-i18n="successText">Great</p>
+    </div>
+
+    <script>
+      const languageNames = {
+        en: "English",
+        es: "Spanish",
+        fr: "French",
+        nl: "Dutch",
+        it: "Italian"
+      };
+
+      const blockedTranslations = {
+        en: {
+          logoAlt: "For You & Me Escape",
+          blockedTitle: "Blocked for now",
+          blockedMessage: "This path is blocked for now.",
+          blockedFollowUp: "The next part will open when the time is right.",
+          followUpOne: "Then it begins.",
+          followUpTwo: "The next part will reveal itself tomorrow",
+          successText: "Great"
+        },
+        es: {
+          logoAlt: "For You & Me Escape",
+          blockedTitle: "Bloqueado por ahora",
+          blockedMessage: "Este camino esta bloqueado por ahora.",
+          blockedFollowUp: "La siguiente parte se abrira cuando llegue el momento.",
+          followUpOne: "Entonces comienza.",
+          followUpTwo: "La siguiente parte se revelara manana",
+          successText: "Great"
+        },
+        fr: {
+          logoAlt: "For You & Me Escape",
+          blockedTitle: "Bloque pour l'instant",
+          blockedMessage: "Ce chemin est bloque pour l'instant.",
+          blockedFollowUp: "La prochaine partie s'ouvrira quand le moment sera venu.",
+          followUpOne: "Alors, cela commence.",
+          followUpTwo: "La suite se revelera demain",
+          successText: "Great"
+        },
+        nl: {
+          logoAlt: "For You & Me Escape",
+          blockedTitle: "Voorlopig geblokkeerd",
+          blockedMessage: "Dit pad is voorlopig geblokkeerd.",
+          blockedFollowUp: "Het volgende deel opent wanneer de tijd rijp is.",
+          followUpOne: "Dan begint het.",
+          followUpTwo: "Het volgende deel zal zich morgen onthullen",
+          successText: "Great"
+        },
+        it: {
+          logoAlt: "For You & Me Escape",
+          blockedTitle: "Bloccato per ora",
+          blockedMessage: "Questo percorso e bloccato per ora.",
+          blockedFollowUp: "La prossima parte si aprira al momento giusto.",
+          followUpOne: "Allora comincia.",
+          followUpTwo: "La prossima parte si rivelera domani",
+          successText: "Great"
+        }
+      };
+
+      const stageDefinitions = {
+        sehh: {
+          available: true,
+          translations: {
+            en: {
+              followUpOne: "Then it begins.",
+              followUpTwo: "The next part will reveal itself tomorrow"
+            },
+            es: {
+              followUpOne: "Entonces comienza.",
+              followUpTwo: "La siguiente parte se revelara manana"
+            },
+            fr: {
+              followUpOne: "Alors, cela commence.",
+              followUpTwo: "La suite se revelera demain"
+            },
+            nl: {
+              followUpOne: "Dan begint het.",
+              followUpTwo: "Het volgende deel zal zich morgen onthullen"
+            },
+            it: {
+              followUpOne: "Allora comincia.",
+              followUpTwo: "La prossima parte si rivelera domani"
+            }
+          },
+          followUpLines: {
+            en: ["Then it begins.", "The next part will reveal itself tomorrow"],
+            es: ["Entonces comienza.", "La siguiente parte se revelara manana"],
+            fr: ["Alors, cela commence.", "La suite se revelera demain"],
+            nl: ["Dan begint het.", "Het volgende deel zal zich morgen onthullen"],
+            it: ["Allora comincia.", "La prossima parte si rivelera domani"]
+          },
+          successText: "Great"
+        },
+        ukq: {
+          available: true,
+          translations: {
+            en: {
+              followUpOne: "That is correct!",
+              followUpTwo: "It's a Bull…",
+              followUpThree: "The bull stands for strength that does not rush,",
+              followUpFour: "and for one who guards what is held close.",
+              successText: "Correct."
+            },
+            es: {
+              followUpOne: "Es correcto!",
+              followUpTwo: "Es un toro…",
+              followUpThree: "El toro representa una fuerza que no se precipita,",
+              followUpFour: "y a quien protege lo que guarda cerca.",
+              successText: "Correct."
+            },
+            fr: {
+              followUpOne: "C'est exact !",
+              followUpTwo: "C'est un taureau…",
+              followUpThree: "Le taureau symbolise une force qui ne se precipite pas,",
+              followUpFour: "et celui qui veille sur ce qu'il garde pres de lui.",
+              successText: "Correct."
+            },
+            nl: {
+              followUpOne: "Dat is juist!",
+              followUpTwo: "Het is een stier…",
+              followUpThree: "De stier staat voor kracht die niet haast,",
+              followUpFour: "en voor wie bewaakt wat dicht bij hem wordt gehouden.",
+              successText: "Correct."
+            },
+            it: {
+              followUpOne: "E corretto!",
+              followUpTwo: "E un toro…",
+              followUpThree: "Il toro rappresenta una forza che non si precipita,",
+              followUpFour: "e chi custodisce cio che tiene vicino.",
+              successText: "Correct."
+            }
+          },
+          followUpLines: {
+            en: [
+              "That is correct!",
+              "It's a Bull…",
+              "The bull stands for strength that does not rush,",
+              "and for one who guards what is held close."
+            ],
+            es: [
+              "Es correcto!",
+              "Es un toro…",
+              "El toro representa una fuerza que no se precipita,",
+              "y a quien protege lo que guarda cerca."
+            ],
+            fr: [
+              "C'est exact !",
+              "C'est un taureau…",
+              "Le taureau symbolise une force qui ne se precipite pas,",
+              "et celui qui veille sur ce qu'il garde pres de lui."
+            ],
+            nl: [
+              "Dat is juist!",
+              "Het is een stier…",
+              "De stier staat voor kracht die niet haast,",
+              "en voor wie bewaakt wat dicht bij hem wordt gehouden."
+            ],
+            it: [
+              "E corretto!",
+              "E un toro…",
+              "Il toro rappresenta una forza che non si precipita,",
+              "e chi custodisce cio che tiene vicino."
+            ]
+          }
+        }
+      };
+
+      const storageKeys = {
+        language: "siteLanguage",
+        progress: "forYouAndMeEscape.progress"
+      };
+
+      const languageButtons = document.querySelectorAll("[data-language]");
+      const followupView = document.querySelector('[data-view="followup"]');
+      const blockedView = document.querySelector('[data-view="blocked"]');
+      const overlay = document.querySelector(".correct-overlay");
+      const overlayText = document.querySelector(".correct-text");
+      const followupCopy = document.querySelector("[data-followup-copy]");
+      const followupTextNodes = document.querySelectorAll("[data-i18n]");
+      const attributeNodes = document.querySelectorAll("[data-i18n-attr]");
+
+      const stageId = new URLSearchParams(window.location.search).get("stage") || "sehh";
+      const stageDefinition = stageDefinitions[stageId] || null;
+      const progress = loadProgress();
+      let selectedLanguage = localStorage.getItem(storageKeys.language) || "en";
+      let overlayTimer;
+
+      function loadProgress() {
+        try {
+          const raw = localStorage.getItem(storageKeys.progress);
+          if (!raw) {
+            return { solvedStages: {}, attemptsByStage: {} };
+          }
+
+          const parsed = JSON.parse(raw);
+          return {
+            solvedStages: parsed.solvedStages || {},
+            attemptsByStage: parsed.attemptsByStage || {}
+          };
+        } catch (error) {
+          return { solvedStages: {}, attemptsByStage: {} };
+        }
+      }
+
+      function isStageSolved() {
+        return Boolean(progress.solvedStages[stageId]);
+      }
+
+      function getCopy(language) {
+        return {
+          ...blockedTranslations[language] || blockedTranslations.en,
+          ...(stageDefinition?.translations?.[language] || stageDefinition?.translations?.en || {})
+        };
+      }
+
+      function getFollowupLines(language) {
+        const lines = stageDefinition?.followUpLines?.[language]
+          || stageDefinition?.followUpLines?.en
+          || [
+            stageDefinition?.translations?.[language]?.followUpOne
+              || stageDefinition?.translations?.en?.followUpOne
+              || blockedTranslations[language]?.followUpOne
+              || blockedTranslations.en.followUpOne,
+            stageDefinition?.translations?.[language]?.followUpTwo
+              || stageDefinition?.translations?.en?.followUpTwo
+              || blockedTranslations[language]?.followUpTwo
+              || blockedTranslations.en.followUpTwo
+          ];
+
+        return lines.filter(Boolean);
+      }
+
+      function renderFollowupLines(language) {
+        if (!followupCopy) {
+          return;
+        }
+
+        const lines = getFollowupLines(language);
+        followupCopy.innerHTML = lines
+          .map((line) => `<p>${line}</p>`)
+          .join("");
+      }
+
+      function renderLanguage(language) {
+        const copy = getCopy(language);
+
+        document.documentElement.lang = language;
+        renderFollowupLines(language);
+        followupTextNodes.forEach((element) => {
+          const key = element.dataset.i18n;
+          if (copy[key]) {
+            element.textContent = copy[key];
+          }
+        });
+        attributeNodes.forEach((element) => {
+          element.dataset.i18nAttr.split(",").forEach((entry) => {
+            const [attribute, key] = entry.split(":").map((part) => part.trim());
+            if (copy[key]) {
+              element.setAttribute(attribute, copy[key]);
+            }
+          });
+        });
+
+        languageButtons.forEach((button) => {
+          const isActive = button.dataset.language === language;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.setAttribute("aria-label", languageNames[button.dataset.language]);
+        });
+
+        localStorage.setItem(storageKeys.language, language);
+        overlayText.textContent = copy.successText || "Great";
+      }
+
+      function showBlockedView() {
+        followupView.classList.add("is-hidden");
+        blockedView.classList.remove("is-hidden");
+      }
+
+      function showFollowupView() {
+        blockedView.classList.add("is-hidden");
+        followupView.classList.remove("is-hidden");
+      }
+
+      function runOverlay() {
+        window.clearTimeout(overlayTimer);
+        const copy = getCopy(selectedLanguage);
+        overlayText.textContent = copy.successText || "Great";
+        overlayText.style.setProperty("--text-characters", Array.from(copy.successText || "Great").length);
+        overlayText.style.setProperty("--text-width", `${Array.from(copy.successText || "Great").length}ch`);
+        overlay.setAttribute("aria-hidden", "false");
+        overlay.classList.add("is-visible");
+
+        overlayTimer = window.setTimeout(() => {
+          overlay.classList.remove("is-visible");
+          overlay.setAttribute("aria-hidden", "true");
+        }, 1550);
+      }
+
+      function setLanguage(language) {
+        selectedLanguage = language;
+        renderLanguage(language);
+
+        if (!stageDefinition || !stageDefinition.available || !isStageSolved()) {
+          showBlockedView();
+          return;
+        }
+
+        showFollowupView();
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.language));
+      });
+
+      window.addEventListener("pageshow", () => {
+        window.clearTimeout(overlayTimer);
+        overlay.classList.remove("is-visible");
+        overlay.setAttribute("aria-hidden", "true");
+        setLanguage(selectedLanguage);
+        if (stageDefinition && stageDefinition.available && isStageSolved()) {
+          runOverlay();
+        }
+      });
+
+      renderLanguage(selectedLanguage);
+      setLanguage(selectedLanguage);
+
+      if (stageDefinition && stageDefinition.available && isStageSolved()) {
+        runOverlay();
+      }
+    </script>
+  </body>
+</html>
