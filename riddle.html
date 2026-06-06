@@ -198,6 +198,22 @@
         white-space: pre-line;
       }
 
+      .puzzle-stage[data-stage="ia"] .scroll-content {
+        inset: 10.5% 9.5% 12% 9.5%;
+        gap: clamp(10px, 1.2vw, 14px);
+        padding: clamp(14px, 2.4vw, 24px);
+      }
+
+      .puzzle-stage[data-stage="ia"] .riddle-copy {
+        gap: 8px;
+        font-size: clamp(1.1rem, 2.28vw, 1.42rem);
+        line-height: 1.3;
+      }
+
+      .puzzle-stage[data-stage="ia"] .riddle-copy p {
+        text-wrap: balance;
+      }
+
       .answer-form {
         display: grid;
         gap: 12px;
@@ -400,6 +416,17 @@
           inset: 9.5% 7.5% 10% 7.5%;
           padding: 14px 10px;
           gap: 10px;
+        }
+
+        .puzzle-stage[data-stage="ia"] .scroll-content {
+          inset: 10% 8.75% 11.25% 8.75%;
+          gap: 8px;
+          padding: 12px 10px;
+        }
+
+        .puzzle-stage[data-stage="ia"] .riddle-copy {
+          font-size: clamp(1rem, 3.6vw, 1.24rem);
+          line-height: 1.16;
         }
 
           .answer-input {
@@ -616,11 +643,65 @@
         },
         iwnnu: {
           available: true,
-          nextStage: "ia"
+          nextStage: "ia",
+          translations: {
+            en: {
+              riddleLineOne: "Within the courtyard of Florence's old town hall palace",
+              riddleLineTwo: "I am held by a child with an angelical face",
+              riddleLineThree: "kept like a companion, not a toy\nAt sea, I guide the way with endless joy\n\nWhat am I?",
+              answer: "A Dolphin"
+            },
+            es: {
+              riddleLineOne: "Dentro del patio del antiguo palacio del ayuntamiento de Florencia",
+              riddleLineTwo: "Soy sostenido por un nino de rostro angelical",
+              riddleLineThree: "guardado como companero, no como juguete\nEn el mar, guio el camino con alegria sin fin\n\nQue soy?",
+              answer: "Un delfin"
+            },
+            fr: {
+              riddleLineOne: "Dans la cour de l'ancien palais de l'hôtel de ville de Florence",
+              riddleLineTwo: "je suis tenu par un enfant au visage angelique",
+              riddleLineThree: "gardé comme un compagnon, pas comme un jouet\nEn mer, je guide le chemin avec une joie sans fin\n\nQui suis-je ?",
+              answer: "Un dauphin"
+            },
+            nl: {
+              riddleLineOne: "Op de binnenplaats van het oude stadhuispaleis van Florence",
+              riddleLineTwo: "word ik vastgehouden door een kind met een engelachtig gezicht",
+              riddleLineThree: "bewaard als gezelschap, niet als speelgoed\nOp zee wijs ik de weg met eindeloze vreugde\n\nWat ben ik?",
+              answer: "Een dolfijn"
+            },
+            it: {
+              riddleLineOne: "Nel cortile del vecchio palazzo del municipio di Firenze",
+              riddleLineTwo: "sono tenuto da un bambino dal volto angelico",
+              riddleLineThree: "custodito come compagno, non come giocattolo\nIn mare, guido la via con infinita gioia\n\nCosa sono?",
+              answer: "Un delfino"
+            }
+          }
         },
         ia: {
           available: true,
-          nextStage: null
+          nextStage: null,
+          translations: {
+            en: {
+              riddleLineOne: "One place remains,\nPast the known stone balcony of renown,\nseek the sacred path further up from town\nwhere cypress line the climb in patient rows,\nand silence near a basilica softly grows\n\nBeyond the Duomo's dome and Palazzo's crown,\nthose familiar shapes laid gently down\nAbove the rooftops, where Florence fades to sky,\nthe city becomes one sight from up high\n\nSo go where the city rests above its frame,\nto the monastery that guards the hill's old name\nAnd there, from all you'll see when you arrive,\nAnswer,\nwhat is gained when everything aligns just right?",
+              answer: "Perspective"
+            },
+            es: {
+              riddleLineOne: "Queda un lugar,\nMas alla del conocido balcon de piedra de renombre,\nbusca el sendero sagrado mas arriba de la ciudad\ndonde los cipreses acompanan el ascenso en filas pacientes,\ny el silencio junto a una basilica crece suavemente\n\nMas alla de la cupula del Duomo y la corona del Palazzo,\nlas formas familiares se dejan caer con suavidad\nSobre los tejados, donde Florencia se funde con el cielo,\nla ciudad se vuelve una sola vista desde lo alto\n\nAsi que ve donde la ciudad descansa sobre su marco,\naquel monasterio que guarda el antiguo nombre de la colina\nY alli, de todo lo que veras al llegar,\nResponde,\nque se gana cuando todo encaja justo como debe?",
+              answer: "Perspectiva"
+            },
+            fr: {
+              riddleLineOne: "Il reste un lieu,\nAu-dela du balcon de pierre connu et celebre,\ncherche le chemin sacre plus haut que la ville\nou les cyprès bordent l'ascension en rangs patients,\net le silence pres d'une basilique grandit doucement\n\nAu-dela du dome du Duomo et de la couronne du Palazzo,\nces formes familières se deposent doucement\nAu-dessus des toits, ou Florence se fond dans le ciel,\nla ville devient un seul regard depuis les hauteurs\n\nAlors va la ou la ville repose au-dessus de son cadre,\nvers le monastere qui garde l'ancien nom de la colline\nEt la, de tout ce que tu verras en arrivant,\nReponds,\nqu'est-ce qui est gagne quand tout s'aligne juste comme il faut ?",
+              answer: "Perspective"
+            },
+            nl: {
+              riddleLineOne: "Er blijft nog één plek over,\nVoorbij het bekende stenen balkon van faam,\nzoek het heilige pad verder de stad uit\nwaar cipressen de klim in geduldige rijen omlijnen,\nen stilte bij een basiliek zacht groeit\n\nVoorbij de koepel van de Duomo en de kroon van het Palazzo,\nworden die vertrouwde vormen zacht neergelegd\nBoven de daken, waar Florence in de lucht vervaagt,\nwordt de stad één aanblik van hoog boven\n\nGa dus waar de stad boven haar kader rust,\nnaar het klooster dat de oude naam van de heuvel bewaakt\nEn daar, van alles wat je zult zien als je aankomt,\nAntwoord,\nwat wordt gewonnen wanneer alles precies op zijn plaats valt?",
+              answer: "Perspectief"
+            },
+            it: {
+              riddleLineOne: "Resta un luogo,\nOltre il noto balcone di pietra dalla fama antica,\ncerca il sentiero sacro piu in alto rispetto alla citta\ndove i cipressi accompagnano la salita in file pazienti,\ne il silenzio accanto a una basilica cresce piano\n\nOltre la cupola del Duomo e la corona del Palazzo,\nquelle forme familiari si posano dolcemente\nSopra i tetti, dove Firenze sfuma nel cielo,\nla citta diventa un solo sguardo dall'alto\n\nAllora vai dove la citta riposa sopra il suo profilo,\nverso il monastero che custodisce l'antico nome del colle\nE li, di tutto cio che vedrai quando arriverai,\nRispondi,\nche cosa si guadagna quando tutto si allinea nel modo giusto?",
+              answer: "Prospettiva"
+            }
+          }
         }
       };
 
@@ -730,9 +811,7 @@
         document.documentElement.lang = language;
         riddleTextNodes.forEach((element) => {
           const key = element.dataset.i18n;
-          if (copy[key]) {
-            element.textContent = copy[key];
-          }
+          element.textContent = copy[key] || "";
         });
         attributesNodes.forEach((element) => {
           element.dataset.i18nAttr.split(",").forEach((entry) => {
@@ -824,12 +903,14 @@
         blockedView.classList.add("is-hidden");
         closedView.classList.remove("is-hidden");
         puzzleView.classList.add("is-hidden");
+        delete puzzleView.dataset.stage;
       }
 
       function showPuzzleView() {
         blockedView.classList.add("is-hidden");
         closedView.classList.add("is-hidden");
         puzzleView.classList.remove("is-hidden");
+        puzzleView.dataset.stage = stageId;
         window.requestAnimationFrame(() => {
           puzzleView.classList.add("is-visible");
         });
@@ -848,7 +929,6 @@
 
         hasOpenedScroll = true;
         showPuzzleView();
-        answerInput.focus();
       }
 
       function submitAnswer(event) {
