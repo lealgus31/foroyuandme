@@ -116,6 +116,10 @@
         box-shadow: 0 12px 28px rgba(61, 42, 22, 0.12);
       }
 
+      .followup-art.is-hidden {
+        display: none !important;
+      }
+
       .followup-art img {
         width: 100%;
         height: 100%;
@@ -315,6 +319,7 @@
       const stageDefinitions = {
         sehh: {
           available: true,
+          showArt: false,
           translations: {
             en: {
               followUpOne: "Then it begins.",
@@ -348,6 +353,7 @@
         },
         ukq: {
           available: true,
+          showArt: true,
           translations: {
             en: {
               followUpOne: "That is correct!",
@@ -430,6 +436,7 @@
       const blockedView = document.querySelector('[data-view="blocked"]');
       const overlay = document.querySelector(".correct-overlay");
       const overlayText = document.querySelector(".correct-text");
+      const followupArt = document.querySelector(".followup-art");
       const followupCopy = document.querySelector("[data-followup-copy]");
       const followupTextNodes = document.querySelectorAll("[data-i18n]");
       const attributeNodes = document.querySelectorAll("[data-i18n-attr]");
@@ -500,6 +507,7 @@
         const copy = getCopy(language);
 
         document.documentElement.lang = language;
+        followupArt.classList.toggle("is-hidden", !stageDefinition?.showArt);
         renderFollowupLines(language);
         followupTextNodes.forEach((element) => {
           const key = element.dataset.i18n;
