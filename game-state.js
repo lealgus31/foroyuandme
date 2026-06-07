@@ -47,6 +47,7 @@
       throw new Error("Backend not configured");
     }
 
+    const hasBody = typeof options.body !== "undefined";
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), requestTimeoutMs);
 
@@ -55,7 +56,7 @@
         ...options,
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json",
+          ...(hasBody ? { "Content-Type": "application/json" } : {}),
           ...(options.headers || {})
         },
         signal: controller.signal
