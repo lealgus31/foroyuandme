@@ -51,16 +51,6 @@ Resources:
     Properties:
       TargetFunctionArn: !GetAtt GameApiFunction.Arn
       AuthType: NONE
-      Cors:
-        AllowOrigins:
-          - "*"
-        AllowMethods:
-          - GET
-          - POST
-        AllowHeaders:
-          - content-type
-          - authorization
-        AllowCredentials: false
 
   GameApiFunctionUrlPermission:
     Type: AWS::Lambda::Permission
@@ -69,6 +59,14 @@ Resources:
       FunctionName: !Ref GameApiFunction
       Principal: "*"
       FunctionUrlAuthType: NONE
+
+  GameApiFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GameApiFunction
+      Principal: "*"
+      InvokedViaFunctionUrl: true
 
 Outputs:
   FunctionUrl:
