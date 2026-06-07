@@ -106,6 +106,26 @@
         margin: 0;
       }
 
+      .loading-panel {
+        width: min(100%, 640px);
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .loading-title {
+        margin: 0;
+        font: 700 clamp(1.8rem, 5vw, 3.2rem) Georgia, "Times New Roman", serif;
+      }
+
+      .loading-copy {
+        margin: 0;
+        color: #6f5b49;
+        font: clamp(1.02rem, 2vw, 1.28rem) Georgia, "Times New Roman", serif;
+        line-height: 1.5;
+      }
+
       .closed-stage {
         width: min(100%, 600px);
         display: grid;
@@ -484,6 +504,11 @@
     </nav>
 
     <main class="page-shell">
+      <section class="loading-panel is-hidden" aria-live="polite" data-view="loading">
+        <h1 class="loading-title" data-i18n="loadingTitle">Checking the path…</h1>
+        <p class="loading-copy" data-i18n="loadingMessage">Please wait a moment.</p>
+      </section>
+
       <section class="blocked-panel is-hidden" aria-live="polite" data-view="blocked">
         <h1 class="blocked-title" data-i18n="blockedTitle">Blocked for now</h1>
         <div class="blocked-copy">
@@ -538,6 +563,8 @@
       </section>
     </main>
 
+    <script src="app-config.js"></script>
+    <script src="game-state.js"></script>
     <script>
       const languageNames = {
         en: "English",
@@ -549,6 +576,8 @@
 
       const blockedTranslations = {
         en: {
+          loadingTitle: "Checking the path…",
+          loadingMessage: "Please wait a moment.",
           blockedTitle: "Blocked for now",
           blockedMessage: "This path is blocked for now.",
           blockedFollowUp: "The next part will open when the time is right.",
@@ -560,6 +589,8 @@
           wrongAnswer: "Not quite yet."
         },
         es: {
+          loadingTitle: "Comprobando el camino…",
+          loadingMessage: "Espera un momento.",
           blockedTitle: "Bloqueado por ahora",
           blockedMessage: "Este camino esta bloqueado por ahora.",
           blockedFollowUp: "La siguiente parte se abrira cuando llegue el momento.",
@@ -571,6 +602,8 @@
           wrongAnswer: "Todavia no."
         },
         fr: {
+          loadingTitle: "Verification du chemin…",
+          loadingMessage: "Patiente un instant.",
           blockedTitle: "Bloque pour l'instant",
           blockedMessage: "Ce chemin est bloque pour l'instant.",
           blockedFollowUp: "La prochaine partie s'ouvrira quand le moment sera venu.",
@@ -582,6 +615,8 @@
           wrongAnswer: "Pas encore."
         },
         nl: {
+          loadingTitle: "Pad wordt gecontroleerd…",
+          loadingMessage: "Wacht even.",
           blockedTitle: "Voorlopig geblokkeerd",
           blockedMessage: "Dit pad is voorlopig geblokkeerd.",
           blockedFollowUp: "Het volgende deel opent wanneer de tijd rijp is.",
@@ -593,6 +628,8 @@
           wrongAnswer: "Nog niet helemaal."
         },
         it: {
+          loadingTitle: "Controllo del percorso…",
+          loadingMessage: "Attendi un momento.",
           blockedTitle: "Bloccato per ora",
           blockedMessage: "Questo percorso e bloccato per ora.",
           blockedFollowUp: "La prossima parte si aprira al momento giusto.",
@@ -745,12 +782,16 @@
 
       const storageKeys = {
         language: "siteLanguage",
-        progress: "forYouAndMeEscape.progress"
+        progress: "forYouAndMeEscape.progress",
+        pendingSync: "forYouAndMeEscape.pendingSync"
       };
 
       const firstRevealThreshold = 2;
       const lastRevealThreshold = 4;
+      const backendClient = window.FYME_REMOTE || null;
+      const backendEnabled = Boolean(backendClient?.enabled);
       const languageButtons = document.querySelectorAll("[data-language]");
+      const loadingView = document.querySelector('[data-view="loading"]');
       const blockedView = document.querySelector('[data-view="blocked"]');
       const closedView = document.querySelector('[data-view="closed"]');
       const puzzleView = document.querySelector('[data-view="puzzle"]');
@@ -769,6 +810,8 @@
       let progress = initialProgress;
       let selectedLanguage = localStorage.getItem(storageKeys.language) || "en";
       let hasOpenedScroll = false;
+      let remoteState = backendEnabled ? backendClient.getCachedState() : null;
+      let remoteStateReady = !backendEnabled;
       const navigationEntry = performance.getEntriesByType("navigation")[0];
       const isReload = navigationEntry ? navigationEntry.type === "reload" : false;
 
@@ -798,6 +841,73 @@
         localStorage.setItem(storageKeys.progress, JSON.stringify(progress));
       }
 
+      function loadPendingSyncStages() {
+        try {
+          const raw = localStorage.getItem(storageKeys.pendingSync);
+          if (!raw) {
+            return [];
+          }
+
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed.filter((stage) => stageDefinitions[stage]) : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function savePendingSyncStages(stages) {
+        localStorage.setItem(storageKeys.pendingSync, JSON.stringify(stages));
+      }
+
+      function queuePendingSyncStage(stage) {
+        const pending = loadPendingSyncStages();
+        if (!pending.includes(stage)) {
+          pending.push(stage);
+          savePendingSyncStages(pending);
+        }
+      }
+
+      async function flushPendingSyncStages() {
+        if (!backendEnabled) {
+          return;
+        }
+
+        const pending = loadPendingSyncStages();
+        if (!pending.length) {
+          return;
+        }
+
+        const remaining = [];
+        for (const stage of pending) {
+          try {
+            remoteState = await backendClient.solveStage(stage);
+          } catch (error) {
+            remaining.push(stage);
+          }
+        }
+
+        savePendingSyncStages(remaining);
+      }
+
+      async function refreshRemoteState() {
+        if (!backendEnabled) {
+          remoteStateReady = true;
+          return null;
+        }
+
+        remoteStateReady = false;
+        try {
+          remoteState = await backendClient.fetchState();
+          await flushPendingSyncStages();
+        } catch (error) {
+          remoteState = backendClient.getCachedState();
+        } finally {
+          remoteStateReady = true;
+        }
+
+        return remoteState;
+      }
+
       function getStageCopy(language) {
         const fallback = stageDefinition.translations?.en || blockedTranslations.en;
         return {
@@ -807,10 +917,19 @@
       }
 
       function isStageSolved() {
-        return Boolean(progress.solvedStages[stageId]);
+        const remoteSolved = remoteState?.solvedStages?.[stageId];
+        return Boolean(remoteSolved || progress.solvedStages[stageId]);
       }
 
       function isStageUnlocked() {
+        if (backendEnabled && remoteStateReady && remoteState?.availableStages) {
+          return Boolean(remoteState.availableStages[stageId]);
+        }
+
+        if (backendEnabled && remoteStateReady) {
+          return false;
+        }
+
         if (!stageDefinition.available) {
           return false;
         }
@@ -932,12 +1051,14 @@
       }
 
       function showBlockedView() {
+        loadingView.classList.add("is-hidden");
         blockedView.classList.remove("is-hidden");
         closedView.classList.add("is-hidden");
         puzzleView.classList.add("is-hidden");
       }
 
       function showClosedView() {
+        loadingView.classList.add("is-hidden");
         blockedView.classList.add("is-hidden");
         closedView.classList.remove("is-hidden");
         puzzleView.classList.add("is-hidden");
@@ -945,6 +1066,7 @@
       }
 
       function showPuzzleView() {
+        loadingView.classList.add("is-hidden");
         blockedView.classList.add("is-hidden");
         closedView.classList.add("is-hidden");
         puzzleView.classList.remove("is-hidden");
@@ -952,6 +1074,13 @@
         window.requestAnimationFrame(() => {
           puzzleView.classList.add("is-visible");
         });
+      }
+
+      function showLoadingView() {
+        blockedView.classList.add("is-hidden");
+        closedView.classList.add("is-hidden");
+        puzzleView.classList.add("is-hidden");
+        loadingView.classList.remove("is-hidden");
       }
 
       function resetFeedback() {
@@ -969,7 +1098,7 @@
         showPuzzleView();
       }
 
-      function submitAnswer(event) {
+      async function submitAnswer(event) {
         event.preventDefault();
 
         const answer = getCurrentAnswer(selectedLanguage);
@@ -979,6 +1108,13 @@
         if (submitted && submitted === correct) {
           progress.solvedStages[stageId] = true;
           saveProgress();
+          if (backendEnabled) {
+            try {
+              remoteState = await backendClient.solveStage(stageId);
+            } catch (error) {
+              queuePendingSyncStage(stageId);
+            }
+          }
           window.location.href = stageDefinition.followUpUrl || `followup.html?stage=${stageId}`;
           return;
         }
@@ -1012,6 +1148,25 @@
         showClosedView();
       }
 
+      function renderCurrentView() {
+        if (!remoteStateReady && backendEnabled) {
+          showLoadingView();
+          return;
+        }
+
+        if (!isStageUnlocked()) {
+          showBlockedView();
+          return;
+        }
+
+        if (hasOpenedScroll) {
+          showPuzzleView();
+          return;
+        }
+
+        showClosedView();
+      }
+
       languageButtons.forEach((button) => {
         button.addEventListener("click", () => setLanguage(button.dataset.language));
       });
@@ -1027,18 +1182,29 @@
       window.addEventListener("pageshow", () => {
         hasOpenedScroll = false;
         renderAnswerSlots();
+        if (backendEnabled) {
+          refreshRemoteState().then(() => {
+            setLanguage(selectedLanguage);
+            renderCurrentView();
+          });
+          return;
+        }
+
         setLanguage(selectedLanguage);
+        renderCurrentView();
       });
 
-      renderLanguage(selectedLanguage);
-      updateRiddleContent();
-      renderAnswerSlots();
+      (async () => {
+        if (backendEnabled) {
+          showLoadingView();
+          await refreshRemoteState();
+        }
 
-      if (!isStageUnlocked()) {
-        showBlockedView();
-      } else {
-        showClosedView();
-      }
+        renderLanguage(selectedLanguage);
+        updateRiddleContent();
+        renderAnswerSlots();
+        renderCurrentView();
+      })();
     </script>
   </body>
 </html>

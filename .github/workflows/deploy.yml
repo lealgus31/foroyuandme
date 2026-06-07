@@ -24,4 +24,4 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Sync site to S3
-        run: aws s3 sync . s3://foryouandmebucket --delete
+        run: aws s3 sync . s3://foryouandmebucket --delete --exclude "backend" --exclude "backend/*" --exclude "backend/**"

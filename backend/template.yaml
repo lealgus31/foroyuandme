@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: For You & Me Escape backend state service
+
+Parameters:
+  AdminToken:
+    Type: String
+    NoEcho: true
+    Description: Secret token required for manual unlocks.
+  Stage1UnlockAt:
+    Type: String
+    Default: "2026-06-08T18:00:00Z"
+    Description: UTC unlock time for stage 1.
+  Stage2UnlockAt:
+    Type: String
+    Default: "2026-06-09T07:00:00Z"
+    Description: UTC unlock time for stage 2.
+
+Resources:
+  GameStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+
+  GameApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Timeout: 10
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GameStateTable
+          ADMIN_TOKEN: !Ref AdminToken
+          STAGE1_UNLOCK_AT: !Ref Stage1UnlockAt
+          STAGE2_UNLOCK_AT: !Ref Stage2UnlockAt
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameStateTable
+
+  GameApiFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt GameApiFunction.Arn
+      AuthType: NONE
+      Cors:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - content-type
+          - authorization
+        AllowCredentials: false
+
+  GameApiFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunctionUrl
+      FunctionName: !Ref GameApiFunction
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+
+Outputs:
+  FunctionUrl:
+    Description: Public backend URL for the escape game
+    Value: !GetAtt GameApiFunctionUrl.FunctionUrl

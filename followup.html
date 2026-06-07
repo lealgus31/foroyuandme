@@ -137,6 +137,29 @@
         margin: 0;
       }
 
+      .loading-shell {
+        width: min(100%, 640px);
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        text-align: center;
+        margin-top: 12px;
+      }
+
+      .loading-title {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1.8rem, 5vw, 3rem);
+      }
+
+      .loading-copy {
+        margin: 0;
+        color: #6f5b49;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1rem, 2.2vw, 1.25rem);
+        line-height: 1.5;
+      }
+
       .blocked-title {
         font-size: clamp(1.9rem, 6vw, 3.6rem);
       }
@@ -243,6 +266,11 @@
     <main>
       <img class="page-logo" src="Logo.jpg" alt="For You & Me Escape" data-i18n-attr="alt:logoAlt">
 
+      <section class="loading-shell is-hidden" aria-live="polite" data-view="loading">
+        <h1 class="loading-title" data-i18n="loadingTitle">Checking the path…</h1>
+        <p class="loading-copy" data-i18n="loadingMessage">Please wait a moment.</p>
+      </section>
+
       <section class="followup-shell is-hidden" aria-live="polite" data-view="followup">
         <div class="followup-art" aria-hidden="true">
           <img data-followup-art src="bull.png" alt="" loading="lazy">
@@ -263,6 +291,8 @@
       <p class="correct-text" data-i18n="successText">Great</p>
     </div>
 
+    <script src="app-config.js"></script>
+    <script src="game-state.js"></script>
     <script>
       const languageNames = {
         en: "English",
@@ -275,6 +305,8 @@
       const blockedTranslations = {
         en: {
           logoAlt: "For You & Me Escape",
+          loadingTitle: "Checking the path…",
+          loadingMessage: "Please wait a moment.",
           blockedTitle: "Blocked for now",
           blockedMessage: "This path is blocked for now.",
           blockedFollowUp: "The next part will open when the time is right.",
@@ -284,6 +316,8 @@
         },
         es: {
           logoAlt: "For You & Me Escape",
+          loadingTitle: "Comprobando el camino…",
+          loadingMessage: "Espera un momento.",
           blockedTitle: "Bloqueado por ahora",
           blockedMessage: "Este camino esta bloqueado por ahora.",
           blockedFollowUp: "La siguiente parte se abrira cuando llegue el momento.",
@@ -293,6 +327,8 @@
         },
         fr: {
           logoAlt: "For You & Me Escape",
+          loadingTitle: "Verification du chemin…",
+          loadingMessage: "Patiente un instant.",
           blockedTitle: "Bloque pour l'instant",
           blockedMessage: "Ce chemin est bloque pour l'instant.",
           blockedFollowUp: "La prochaine partie s'ouvrira quand le moment sera venu.",
@@ -302,6 +338,8 @@
         },
         nl: {
           logoAlt: "For You & Me Escape",
+          loadingTitle: "Pad wordt gecontroleerd…",
+          loadingMessage: "Wacht even.",
           blockedTitle: "Voorlopig geblokkeerd",
           blockedMessage: "Dit pad is voorlopig geblokkeerd.",
           blockedFollowUp: "Het volgende deel opent wanneer de tijd rijp is.",
@@ -311,6 +349,8 @@
         },
         it: {
           logoAlt: "For You & Me Escape",
+          loadingTitle: "Controllo del percorso…",
+          loadingMessage: "Attendi un momento.",
           blockedTitle: "Bloccato per ora",
           blockedMessage: "Questo percorso e bloccato per ora.",
           blockedFollowUp: "La prossima parte si aprira al momento giusto.",
@@ -612,6 +652,7 @@
       };
 
       const languageButtons = document.querySelectorAll("[data-language]");
+      const loadingView = document.querySelector('[data-view="loading"]');
       const followupView = document.querySelector('[data-view="followup"]');
       const blockedView = document.querySelector('[data-view="blocked"]');
       const overlay = document.querySelector(".correct-overlay");
@@ -627,6 +668,10 @@
       const progress = loadProgress();
       let selectedLanguage = localStorage.getItem(storageKeys.language) || "en";
       let overlayTimer;
+      const backendClient = window.FYME_REMOTE || null;
+      const backendEnabled = Boolean(backendClient?.enabled);
+      let remoteState = backendEnabled ? backendClient.getCachedState() : null;
+      let remoteStateReady = !backendEnabled;
 
       function loadProgress() {
         try {
@@ -646,7 +691,8 @@
       }
 
       function isStageSolved() {
-        return Boolean(progress.solvedStages[stageId]);
+        const remoteSolved = remoteState?.solvedStages?.[stageId];
+        return Boolean(remoteSolved || progress.solvedStages[stageId]);
       }
 
       function getCopy(language) {
@@ -654,6 +700,24 @@
           ...blockedTranslations[language] || blockedTranslations.en,
           ...(stageDefinition?.translations?.[language] || stageDefinition?.translations?.en || {})
         };
+      }
+
+      async function refreshRemoteState() {
+        if (!backendEnabled) {
+          remoteStateReady = true;
+          return null;
+        }
+
+        remoteStateReady = false;
+        try {
+          remoteState = await backendClient.fetchState();
+        } catch (error) {
+          remoteState = backendClient.getCachedState();
+        } finally {
+          remoteStateReady = true;
+        }
+
+        return remoteState;
       }
 
       function getFollowupLines(language) {
@@ -688,6 +752,7 @@
         const copy = getCopy(language);
 
         document.documentElement.lang = language;
+        loadingView.classList.toggle("is-hidden", !(backendEnabled && !remoteStateReady));
         followupArt.classList.toggle("is-hidden", !stageDefinition?.showArt);
         followupArt.classList.toggle("dolphin-art", stageId === "iwnnu");
         if (followupArtImage) {
@@ -720,13 +785,21 @@
       }
 
       function showBlockedView() {
+        loadingView.classList.add("is-hidden");
         followupView.classList.add("is-hidden");
         blockedView.classList.remove("is-hidden");
       }
 
       function showFollowupView() {
+        loadingView.classList.add("is-hidden");
         blockedView.classList.add("is-hidden");
         followupView.classList.remove("is-hidden");
+      }
+
+      function showLoadingView() {
+        blockedView.classList.add("is-hidden");
+        followupView.classList.add("is-hidden");
+        loadingView.classList.remove("is-hidden");
       }
 
       function runOverlay() {
@@ -748,6 +821,11 @@
         selectedLanguage = language;
         renderLanguage(language);
 
+        if (backendEnabled && !remoteStateReady) {
+          showLoadingView();
+          return;
+        }
+
         if (!stageDefinition || !stageDefinition.available || !isStageSolved()) {
           showBlockedView();
           return;
@@ -764,18 +842,35 @@
         window.clearTimeout(overlayTimer);
         overlay.classList.remove("is-visible");
         overlay.setAttribute("aria-hidden", "true");
+        if (backendEnabled) {
+          refreshRemoteState().then(() => {
+            setLanguage(selectedLanguage);
+            if (stageDefinition && stageDefinition.available && isStageSolved()) {
+              runOverlay();
+            }
+          });
+          return;
+        }
+
         setLanguage(selectedLanguage);
         if (stageDefinition && stageDefinition.available && isStageSolved()) {
           runOverlay();
         }
       });
 
-      renderLanguage(selectedLanguage);
-      setLanguage(selectedLanguage);
+      (async () => {
+        if (backendEnabled) {
+          showLoadingView();
+          await refreshRemoteState();
+        }
 
-      if (stageDefinition && stageDefinition.available && isStageSolved()) {
-        runOverlay();
-      }
+        renderLanguage(selectedLanguage);
+        setLanguage(selectedLanguage);
+
+        if (stageDefinition && stageDefinition.available && isStageSolved()) {
+          runOverlay();
+        }
+      })();
     </script>
   </body>
 </html>
