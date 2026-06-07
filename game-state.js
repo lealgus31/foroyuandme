@@ -101,12 +101,38 @@
     return state;
   }
 
+  async function lockStage(stageId, token) {
+    const state = await requestJson("/admin/lock", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ stageId })
+    });
+    writeCache(state);
+    return state;
+  }
+
+  async function resetState(token) {
+    const state = await requestJson("/admin/reset", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({})
+    });
+    writeCache(state);
+    return state;
+  }
+
   window.FYME_REMOTE = {
     enabled: Boolean(apiBaseUrl),
     apiBaseUrl,
     fetchState,
     solveStage,
     unlockStage,
+    lockStage,
+    resetState,
     getCachedState: readCache,
     cacheState: writeCache,
     normalizeState

@@ -128,6 +128,7 @@
         <div class="button-row">
           <button type="button" data-refresh>Refresh status</button>
           <button type="button" class="secondary" data-clear-cache>Clear cached state</button>
+          <button type="button" class="secondary" data-reset-all>Reset all progress</button>
         </div>
         <div class="status" data-backend-status></div>
       </section>
@@ -152,6 +153,7 @@
       const adminTokenInput = document.querySelector("#admin-token");
       const refreshButton = document.querySelector("[data-refresh]");
       const clearCacheButton = document.querySelector("[data-clear-cache]");
+      const resetAllButton = document.querySelector("[data-reset-all]");
 
       const stages = [
         { id: "sehh", label: "Unlock Riddle 1" },
@@ -179,31 +181,38 @@
               <div class="muted">Available: ${available[stage.id] ? "Yes" : "No"} · Solved: ${solved[stage.id] ? "Yes" : "No"}</div>
               <div class="stage-actions">
                 <button type="button" data-unlock="${stage.id}">Unlock</button>
+                <button type="button" class="secondary" data-lock="${stage.id}">Lock</button>
               </div>
             </div>
           </div>
         `).join("");
 
-        stageList.querySelectorAll("[data-unlock]").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const token = adminTokenInput.value.trim();
-            if (!token) {
-              alert("Paste the admin token first.");
-              return;
-            }
+        const runStageAction = async (button, action, label) => {
+          const token = adminTokenInput.value.trim();
+          if (!token) {
+            alert("Paste the admin token first.");
+            return;
+          }
 
-            button.disabled = true;
-            button.textContent = "Unlocking…";
-            try {
-              const nextState = await window.FYME_REMOTE.unlockStage(button.dataset.unlock, token);
-              renderState(nextState);
-            } catch (error) {
-              alert(error.message || "Unlock failed.");
-            } finally {
-              button.disabled = false;
-              button.textContent = "Unlock";
-            }
-          });
+          button.disabled = true;
+          button.textContent = `${label}…`;
+          try {
+            const nextState = await action(button.dataset.unlock || button.dataset.lock, token);
+            renderState(nextState);
+          } catch (error) {
+            alert(error.message || `${label} failed.`);
+          } finally {
+            button.disabled = false;
+            button.textContent = label;
+          }
+        };
+
+        stageList.querySelectorAll("[data-unlock]").forEach((button) => {
+          button.addEventListener("click", () => runStageAction(button, window.FYME_REMOTE.unlockStage, "Unlock"));
+        });
+
+        stageList.querySelectorAll("[data-lock]").forEach((button) => {
+          button.addEventListener("click", () => runStageAction(button, window.FYME_REMOTE.lockStage, "Lock"));
         });
       }
 
@@ -231,6 +240,31 @@
       clearCacheButton.addEventListener("click", () => {
         window.localStorage.removeItem("forYouAndMeEscape.remoteStateCache");
         refreshState();
+      });
+
+      resetAllButton.addEventListener("click", async () => {
+        const token = adminTokenInput.value.trim();
+        if (!token) {
+          alert("Paste the admin token first.");
+          return;
+        }
+
+        const confirmed = window.confirm("Reset all progress on the backend? This will relock every stage.");
+        if (!confirmed) {
+          return;
+        }
+
+        resetAllButton.disabled = true;
+        resetAllButton.textContent = "Resetting…";
+        try {
+          const nextState = await window.FYME_REMOTE.resetState(token);
+          renderState(nextState);
+        } catch (error) {
+          alert(error.message || "Reset failed.");
+        } finally {
+          resetAllButton.disabled = false;
+          resetAllButton.textContent = "Reset all progress";
+        }
       });
 
       refreshState();

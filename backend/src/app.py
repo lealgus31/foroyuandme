@@ -39,6 +39,21 @@ def load_state():
     return item
 
 
+def clear_stage_flags(state, stage_id):
+    solved = state.setdefault("solvedStages", {})
+    forced = state.setdefault("forcedUnlocks", {})
+    solved.pop(stage_id, None)
+    forced.pop(stage_id, None)
+
+
+def reset_state(state):
+    state["solvedStages"] = {}
+    state["forcedUnlocks"] = {}
+    state["updatedAt"] = iso_now()
+    save_state(state)
+    return state
+
+
 def save_state(state):
     TABLE.put_item(Item=state)
 
@@ -154,6 +169,28 @@ def lambda_handler(event, context):
         forced[stage_id] = True
         state["updatedAt"] = iso_now()
         save_state(state)
+        return response(200, {"ok": True, **public_state(state)})
+
+    if method == "POST" and path == "/admin/lock":
+        if not authorize_admin(event):
+            return response(401, {"ok": False, "message": "Unauthorized."})
+
+        body = parse_json_body(event)
+        try:
+            stage_id = require_stage(body.get("stageId"))
+        except ValueError as error:
+            return response(400, {"ok": False, "message": str(error)})
+
+        clear_stage_flags(state, stage_id)
+        state["updatedAt"] = iso_now()
+        save_state(state)
+        return response(200, {"ok": True, **public_state(state)})
+
+    if method == "POST" and path == "/admin/reset":
+        if not authorize_admin(event):
+            return response(401, {"ok": False, "message": "Unauthorized."})
+
+        state = reset_state(state)
         return response(200, {"ok": True, **public_state(state)})
 
     return response(404, {"ok": False, "message": "Not found"})
